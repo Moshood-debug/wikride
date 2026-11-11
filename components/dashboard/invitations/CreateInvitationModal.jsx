@@ -2,14 +2,15 @@
 
 import React, { useState } from 'react';
 import { X, Loader2, Send } from 'lucide-react';
-import { useApiMutation } from '@/hooks/useApiQuery';
+import { useApiMutation } from '@/hooks/useApiMutation';
 import { useApiQuery } from '@/hooks/useApiQuery';
-import { toast } from 'sonner';
 
 export default function CreateInvitationModal({ isOpen, onClose, onSuccess }) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('ORGANIZATION_ADMIN');
   const [organizationId, setOrganizationId] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Fetch organizations for the dropdown
   const { data: orgData, isLoading: isLoadingOrgs } = useApiQuery(
@@ -18,10 +19,7 @@ export default function CreateInvitationModal({ isOpen, onClose, onSuccess }) {
     { enabled: isOpen }
   );
 
-  const mutation = useApiMutation({
-    method: 'POST',
-    url: '/invitations'
-  });
+  const { mutateAsync, isPending } = useApiMutation('/invitations', 'post');
 
   const organizations = React.useMemo(() => {
     if (!orgData) return [];
@@ -39,29 +37,34 @@ export default function CreateInvitationModal({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
+
     if (!email || !organizationId) {
-      toast.error('Please provide an email and select an organization.');
+      setErrorMessage('Please provide an email and select an organization.');
       return;
     }
 
     try {
-      await mutation.mutateAsync({
+      await mutateAsync({
         email,
         role,
         organizationId
       });
       
-      toast.success('Invitation sent successfully!');
+      setSuccessMessage('Invitation sent successfully!');
       
       // Reset form
       setEmail('');
       setRole('ORGANIZATION_ADMIN');
       setOrganizationId('');
       
-      if (onSuccess) onSuccess();
-      onClose();
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+        onClose();
+      }, 1000);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send invitation');
+      setErrorMessage(error.response?.data?.message || error.message || 'Failed to send invitation');
     }
   };
 
@@ -77,6 +80,18 @@ export default function CreateInvitationModal({ isOpen, onClose, onSuccess }) {
             <X size={18} />
           </button>
         </div>
+        
+        {errorMessage && (
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium">
+            {errorMessage}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
+            {successMessage}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5">
           <div className="space-y-1.5">
@@ -140,10 +155,10 @@ export default function CreateInvitationModal({ isOpen, onClose, onSuccess }) {
           </button>
           <button 
             onClick={handleSubmit}
-            disabled={mutation.isLoading}
+            disabled={isPending}
             className="btn-primary"
           >
-            {mutation.isLoading ? (
+            {isPending ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
                 Sending...

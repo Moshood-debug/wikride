@@ -102,6 +102,12 @@ export default function InvitationsPage() {
       ) : (
         <InvitationTable invitations={filteredInvitations} />
       )}
+
+      <CreateInvitationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={handleSuccess} 
+      />
     </div>
   );
 }
