@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/store/useAuthStore";
 
-export const BaseUrl = process.env.NEXT_PUBLIC_API_URL
+export const BaseUrl =
+    process.env.NEXT_PUBLIC_API_URL || "https://wikride-backend.onrender.com/api/v1";
 
 
 

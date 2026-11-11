@@ -20,15 +20,18 @@ export const useApiMutation = (
             const resolvedEndpoint =
                 typeof endpoint === "function" ? endpoint(data) : endpoint;
 
-            const cleanBase = (
-                baseUrl
-            ).replace(/\/+$/, "");
+            const rawBase =
+                baseUrl ||
+                process.env.NEXT_PUBLIC_API_URL ||
+                "https://wikride-backend.onrender.com/api/v1";
 
-            const cleanEndpoint = resolvedEndpoint.startsWith("/")
-                ? resolvedEndpoint
-                : `/${resolvedEndpoint}`;
+            const cleanBase = String(rawBase).replace(/\/+$/, "");
 
-            const url = resolvedEndpoint.startsWith("http")
+            const cleanEndpoint = resolvedEndpoint
+                ? (resolvedEndpoint.startsWith("/") ? resolvedEndpoint : `/${resolvedEndpoint}`)
+                : "";
+
+            const url = resolvedEndpoint && resolvedEndpoint.startsWith("http")
                 ? resolvedEndpoint
                 : `${cleanBase}${cleanEndpoint}`;
 

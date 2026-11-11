@@ -89,7 +89,7 @@ export default function LoginPage() {
           <form suppressHydrationWarning onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {loginError && (
               <div className="bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-xl text-xs font-medium space-y-1">
-                <p>{loginError.message}</p>
+                <p>{loginError.response?.data?.message || loginError.message || "An unexpected error occurred."}</p>
                 {loginError.attempts_remaining !== undefined &&
                   loginError.attempts_remaining !== null && (
                     <p className="text-rose-600/80">
