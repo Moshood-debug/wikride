@@ -2,9 +2,11 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 export const BaseUrl = process.env.NEXT_PUBLIC_API_URL
 
+
+
 export const getAuthConfig = () => {
     let accessToken = null;
-    
+
     // Safely attempt to get the access token
     try {
         accessToken = useAuthStore.getState().accessToken;

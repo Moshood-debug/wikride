@@ -14,7 +14,10 @@ export const useApiQuery = (
     return useQuery({
         queryKey: normalizedKey,
         queryFn: async () => {
-            const url = `${BaseUrl}${endpoint}`;
+            const cleanBase = BaseUrl
+
+            const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+            const url = endpoint.startsWith("http") ? endpoint : `${cleanBase}${cleanEndpoint}`;
             const response = await axios.get(url, {
                 ...getAuthConfig(),
                 validateStatus: (status) => status >= 200 && status < 300,

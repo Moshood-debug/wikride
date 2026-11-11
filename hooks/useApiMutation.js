@@ -20,11 +20,17 @@ export const useApiMutation = (
             const resolvedEndpoint =
                 typeof endpoint === "function" ? endpoint(data) : endpoint;
 
-            const url =
-                resolvedEndpoint.startsWith("http") ||
-                    resolvedEndpoint.startsWith("/api/")
-                    ? resolvedEndpoint
-                    : `${baseUrl}${resolvedEndpoint}`;
+            const cleanBase = (
+                baseUrl
+            ).replace(/\/+$/, "");
+
+            const cleanEndpoint = resolvedEndpoint.startsWith("/")
+                ? resolvedEndpoint
+                : `/${resolvedEndpoint}`;
+
+            const url = resolvedEndpoint.startsWith("http")
+                ? resolvedEndpoint
+                : `${cleanBase}${cleanEndpoint}`;
 
             const authConfig = getAuthConfig();
             const customHeaders = options?.getHeaders ? options.getHeaders(data) : {};
